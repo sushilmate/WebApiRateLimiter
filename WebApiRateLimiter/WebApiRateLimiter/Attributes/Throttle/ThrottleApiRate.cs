@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
+using System;
 
 namespace WebApiRateLimiter.Attributes.Throttle
 {
@@ -19,17 +20,30 @@ namespace WebApiRateLimiter.Attributes.Throttle
         {
             lock (syncLock)
             {
-                //if (!_cache.TryGetValue(, out cacheEntry))
-                //{
-                //}
-            }
-            base.OnActionExecuting(context);
-        }
+                var serviceHitCounter = 0;
+                if (!_cache.TryGetValue(_serviceName, out serviceHitCounter))
+                {
+                    serviceHitCounter = 1;
+                    // Set cache options.
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    {
+                        Priority = CacheItemPriority.High,
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(5)
+                    };
 
-        public static class Identifier
-        {
-            public static readonly string THROTTLE_BASE_IDENTIFIER = "THROTTLE_BASE_";
-            public static readonly string THROTTLE_COUNTER_IDENTIFIER = "THROTTLE_COUNT_";
+                    // Save data in cache.
+                    _cache.Set(_serviceName, serviceHitCounter, cacheEntryOptions);
+                }
+                else
+                {
+                    if(50 > serviceHitCounter)
+                    {
+                        _cache.Set(_serviceName, serviceHitCounter + 1);
+                    }
+                }
+
+                base.OnActionExecuting(context);
+            }
         }
     }
 }

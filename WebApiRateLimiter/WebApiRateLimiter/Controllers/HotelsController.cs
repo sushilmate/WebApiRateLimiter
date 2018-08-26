@@ -55,6 +55,7 @@ namespace WebApiRateLimiter.Controllers
         // GET api/room
         [HttpGet("room/{roomType}")]
         [HttpGet("room/{roomType}/{orderByPriceAsc}")]
+        [TypeFilter(typeof(ThrottleApiRateAttribute), Arguments = new object[] { "GetHotelsByRoomType" })]
         public IEnumerable<HotelViewModel> GetHotelsByRoomType(string roomType, string orderByPriceAsc = "")
         {
             if (string.IsNullOrWhiteSpace(roomType))
