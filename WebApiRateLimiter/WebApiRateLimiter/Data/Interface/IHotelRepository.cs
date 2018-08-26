@@ -8,5 +8,9 @@ namespace CVAHelper.Data.Interface
         IEnumerable<Hotel> GetAllHotels();
 
         bool UpdateOrAddMapping(IEnumerable<Hotel> gidGsrMappings);
+        
+        IEnumerable<Hotel> GetAllHotelsByCity(string city);
+
+        IEnumerable<Hotel> GetAllHotelsByRoomType(string roomType);
     }
 }
