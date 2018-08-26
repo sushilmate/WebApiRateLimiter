@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using CVAHelper.Data.Interface;
+using CVAHelper.Data.Model;
+using CVAHelper.Data.ViewModel;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 namespace WebApiRateLimiter.Controllers
@@ -7,16 +11,27 @@ namespace WebApiRateLimiter.Controllers
     [ApiController]
     public class HotelsController : ControllerBase
     {
-        // GET api/hotels/city
-        [HttpGet("city")]
-        public ActionResult<IEnumerable<string>> GetHotelsByCity()
+        private readonly IMapper _mapper;
+
+        public HotelsController(IHotelRepository hotelRepository, IMapper mapper)
         {
-            return new string[] { "hotel1", "hotel2" };
+            _hotelRepository = hotelRepository;
+            _mapper = mapper;
         }
 
-        // GET api/hotels/room
+        private IHotelRepository _hotelRepository;
+
+        // GET api/city
+        [HttpGet("city")]
+        public IEnumerable<HotelViewModel> GetHotelsByCity()
+        {
+            var hotels = _hotelRepository.GetAllHotels();
+            return _mapper.Map<IEnumerable<Hotel>, IEnumerable<HotelViewModel>>(hotels);
+        }
+
+        // GET api/room
         [HttpGet("room")]
-        public ActionResult<IEnumerable<string>> GetHotelsByRoomType()
+        public IEnumerable<string> GetHotelsByRoomType()
         {
             return new string[] { "hotel3", "hotel4" };
         }
