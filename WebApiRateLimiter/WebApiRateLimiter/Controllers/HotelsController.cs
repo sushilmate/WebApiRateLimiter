@@ -3,8 +3,10 @@ using CVAHelper.Data.Interface;
 using CVAHelper.Data.Model;
 using CVAHelper.Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using System.Linq;
+using WebApiRateLimiter.Attributes.Throttle;
 
 namespace WebApiRateLimiter.Controllers
 {
@@ -12,19 +14,21 @@ namespace WebApiRateLimiter.Controllers
     [ApiController]
     public class HotelsController : ControllerBase
     {
+        private IMemoryCache _memoryCache;
+        private IHotelRepository _hotelRepository;
         private readonly IMapper _mapper;
 
-        public HotelsController(IHotelRepository hotelRepository, IMapper mapper)
+        public HotelsController(IMemoryCache memoryCache, IHotelRepository hotelRepository, IMapper mapper)
         {
+            _memoryCache = memoryCache;
             _hotelRepository = hotelRepository;
             _mapper = mapper;
         }
 
-        private IHotelRepository _hotelRepository;
-
         // GET api/city
         [HttpGet("city/{cityName}")]
         [HttpGet("city/{cityName}/{orderByPriceAsc}")]
+        [TypeFilter(typeof(ThrottleApiRateAttribute), Arguments = new object[] { "GetHotelsByCity" })]
         public IEnumerable<HotelViewModel> GetHotelsByCity(string cityName, string orderByPriceAsc = "")
         {
             if (string.IsNullOrWhiteSpace(cityName))
@@ -34,15 +38,15 @@ namespace WebApiRateLimiter.Controllers
 
             if (orderByPriceAsc.ToLower() == "asc")
             {
-                hotels = _hotelRepository.GetAllHotelsByCity(cityName).OrderBy(x => x.Price).ToList();
+                hotels = _hotelRepository.GetHotelsByCity(cityName).OrderBy(x => x.Price).ToList();
             }
             else if (orderByPriceAsc.ToLower() == "desc")
             {
-                hotels = _hotelRepository.GetAllHotelsByCity(cityName).OrderByDescending(x => x.Price).ToList();
+                hotels = _hotelRepository.GetHotelsByCity(cityName).OrderByDescending(x => x.Price).ToList();
             }
             else
             {
-                hotels = _hotelRepository.GetAllHotelsByCity(cityName).ToList();
+                hotels = _hotelRepository.GetHotelsByCity(cityName).ToList();
             }
 
             return _mapper.Map<IEnumerable<Hotel>, IEnumerable<HotelViewModel>>(hotels);
@@ -60,15 +64,15 @@ namespace WebApiRateLimiter.Controllers
 
             if (orderByPriceAsc.ToLower() == "asc")
             {
-                hotels = _hotelRepository.GetAllHotelsByRoomType(roomType).OrderBy(x => x.Price).ToList();
+                hotels = _hotelRepository.GetHotelsByRoomType(roomType).OrderBy(x => x.Price).ToList();
             }
             else if (orderByPriceAsc.ToLower() == "desc")
             {
-                hotels = _hotelRepository.GetAllHotelsByRoomType(roomType).OrderByDescending(x => x.Price).ToList();
+                hotels = _hotelRepository.GetHotelsByRoomType(roomType).OrderByDescending(x => x.Price).ToList();
             }
             else
             {
-                hotels = _hotelRepository.GetAllHotelsByRoomType(roomType).ToList();
+                hotels = _hotelRepository.GetHotelsByRoomType(roomType).ToList();
             }
 
             return _mapper.Map<IEnumerable<Hotel>, IEnumerable<HotelViewModel>>(hotels);

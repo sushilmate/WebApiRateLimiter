@@ -23,7 +23,8 @@ namespace WebApiRateLimiter
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddTransient<IHotelRepository, HotelRepository>();
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper();
+            services.AddMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

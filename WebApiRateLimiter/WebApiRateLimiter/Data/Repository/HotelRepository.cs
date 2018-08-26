@@ -17,12 +17,12 @@ namespace CVAHelper.Data.Repository
             return AgodaDbContext.Hotels;
         }
 
-        public IEnumerable<Hotel> GetAllHotelsByCity(string city)
+        public IEnumerable<Hotel> GetHotelsByCity(string city)
         {
             return AgodaDbContext.Hotels.Where(x => x.City.ToLower() == city.ToLower());
         }
 
-        public IEnumerable<Hotel> GetAllHotelsByRoomType(string roomType)
+        public IEnumerable<Hotel> GetHotelsByRoomType(string roomType)
         {
             return AgodaDbContext.Hotels.Where(x => x.Room.ToLower() == roomType.ToLower());
         }
