@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace WebApiRateLimiter.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class HotelsController : ControllerBase
     {
