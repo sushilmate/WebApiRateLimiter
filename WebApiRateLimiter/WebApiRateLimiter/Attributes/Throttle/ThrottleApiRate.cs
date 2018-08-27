@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -29,7 +30,7 @@ namespace WebApiRateLimiter.Attributes.Throttle
                 if (apiLimitRuleDetails == null)
                     apiLimitRuleDetails = GetDefaultLimitRateValues();
 
-                if (_cache.Get("ThrottleBaseKey" + _serviceName) == null)
+                if (_cache.Get(GetThrottleBaseKey(_serviceName)) == null)
                 {
                     if (!_cache.TryGetValue(_serviceName, out CacheType serviceHitCounter))
                     {
@@ -68,7 +69,7 @@ namespace WebApiRateLimiter.Attributes.Throttle
                                 Priority = CacheItemPriority.High,
                                 AbsoluteExpiration = DateTime.Now.AddSeconds(apiLimitRuleDetails.SuspendPeriod)
                             };
-                            _cache.Set("ThrottleBaseKey" + _serviceName, true, cacheEntryOptions);
+                            _cache.Set(GetThrottleBaseKey(_serviceName), true, cacheEntryOptions);
                             Forbidden(context);
                         }
                     }
@@ -81,9 +82,9 @@ namespace WebApiRateLimiter.Attributes.Throttle
             }
         }
 
-        private Rule GetDefaultLimitRateValues()
+        private RateLimitRule GetDefaultLimitRateValues()
         {
-            return new Rule()
+            return new RateLimitRule()
             {
                 DefaultLimit = 50,
                 DefaultPeriod = 10,
@@ -93,6 +94,15 @@ namespace WebApiRateLimiter.Attributes.Throttle
 
         private void Forbidden(ActionExecutingContext actionContext)
         {
+            actionContext.Result = new ContentResult()
+            {
+                Content = "Web API Rate Limit Exceeded"
+            };
+        }
+
+        private string GetThrottleBaseKey(string serviceName)
+        {
+            return "ThrottleBaseKey" + serviceName;
         }
     }
 

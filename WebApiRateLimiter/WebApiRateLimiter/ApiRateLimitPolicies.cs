@@ -4,10 +4,10 @@ namespace WebApiRateLimiter
 {
     public class ApiRateLimitPolicies
     {
-        public IEnumerable<Rule> Rules { get; set; }
+        public IEnumerable<RateLimitRule> Rules { get; set; }
     }
 
-    public class Rule
+    public class RateLimitRule
     {
         public string Endpoint { get; set; }
         public int Period { get; set; }
