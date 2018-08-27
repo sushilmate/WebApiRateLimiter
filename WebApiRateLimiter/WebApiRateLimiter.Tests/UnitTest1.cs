@@ -1,13 +1,16 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace WebApiRateLimiter.Tests
 {
     [TestClass]
-    public class UnitTest1
+    public class HttpClientIntegrationTests
     {
+
         [TestMethod]
-        public void TestMethod1()
+        public async Task HttpClient_Should_Get_OKStatus_From_Products_Using_InMemory_Hosting()
         {
+
         }
     }
 }

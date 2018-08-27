@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WebApiRateLimiter.Demo": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "Key": "Value"
+      }
+    }
+  }
+}
