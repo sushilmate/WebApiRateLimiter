@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WebApiRateLimiter.Helpers.Factory;
+using WebApiRateLimiter.Helpers.Interface;
 
 namespace WebApiRateLimiter
 {
@@ -22,6 +24,7 @@ namespace WebApiRateLimiter
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddTransient<IOrderByFactory, CollectionOrderByFactory>();
             services.AddTransient<IHotelRepository, HotelRepository>();
             services.AddAutoMapper();
             services.AddMemoryCache();

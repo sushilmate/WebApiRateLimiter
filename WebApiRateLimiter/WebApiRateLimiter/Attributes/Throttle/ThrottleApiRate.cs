@@ -20,10 +20,14 @@ namespace WebApiRateLimiter.Attributes.Throttle
         {
             lock (syncLock)
             {
-                var serviceHitCounter = 0;
-                if (!_cache.TryGetValue(_serviceName, out serviceHitCounter))
+                if (!_cache.TryGetValue(_serviceName, out CacheType serviceHitCounter))
                 {
-                    serviceHitCounter = 1;
+                    serviceHitCounter = new CacheType
+                    {
+                        ExpiresAt = DateTime.Now.AddSeconds(5),
+                        Counter = 1
+                    };
+
                     // Set cache options.
                     var cacheEntryOptions = new MemoryCacheEntryOptions()
                     {
@@ -36,14 +40,35 @@ namespace WebApiRateLimiter.Attributes.Throttle
                 }
                 else
                 {
-                    if(50 > serviceHitCounter)
+                    if (50 > serviceHitCounter.Counter)
                     {
-                        _cache.Set(_serviceName, serviceHitCounter + 1);
+                        serviceHitCounter.Counter++;
+                        var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        {
+                            Priority = CacheItemPriority.High,
+                            AbsoluteExpiration = serviceHitCounter.ExpiresAt
+                        };
+                        _cache.Set(_serviceName, serviceHitCounter, cacheEntryOptions);
+                    }
+                    else
+                    {
+                        var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        {
+                            Priority = CacheItemPriority.High,
+                            AbsoluteExpiration = DateTime.Now.AddSeconds(5)
+                        };
+                        _cache.Set("ThrottleBaseKey" + _serviceName, cacheEntryOptions);
                     }
                 }
 
                 base.OnActionExecuting(context);
             }
         }
+    }
+
+    internal class CacheType
+    {
+        public DateTime ExpiresAt { get; set; }
+        public int Counter { get; set; }
     }
 }

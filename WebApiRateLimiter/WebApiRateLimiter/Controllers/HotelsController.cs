@@ -7,6 +7,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using System.Linq;
 using WebApiRateLimiter.Attributes.Throttle;
+using WebApiRateLimiter.Helpers.Interface;
 
 namespace WebApiRateLimiter.Controllers
 {
@@ -17,12 +18,14 @@ namespace WebApiRateLimiter.Controllers
         private IMemoryCache _memoryCache;
         private IHotelRepository _hotelRepository;
         private readonly IMapper _mapper;
+        private readonly IOrderByFactory _orderByFactory;
 
-        public HotelsController(IMemoryCache memoryCache, IHotelRepository hotelRepository, IMapper mapper)
+        public HotelsController(IMemoryCache memoryCache, IHotelRepository hotelRepository, IMapper mapper, IOrderByFactory orderByFactory)
         {
             _memoryCache = memoryCache;
             _hotelRepository = hotelRepository;
             _mapper = mapper;
+            _orderByFactory = orderByFactory;
         }
 
         // GET api/city
@@ -34,22 +37,9 @@ namespace WebApiRateLimiter.Controllers
             if (string.IsNullOrWhiteSpace(cityName))
                 return null;
 
-            List<Hotel> hotels = new List<Hotel>();
+            List<Hotel> hotels = _hotelRepository.GetHotelsByCity(cityName).ToList();
 
-            if (orderByPriceAsc.ToLower() == "asc")
-            {
-                hotels = _hotelRepository.GetHotelsByCity(cityName).OrderBy(x => x.Price).ToList();
-            }
-            else if (orderByPriceAsc.ToLower() == "desc")
-            {
-                hotels = _hotelRepository.GetHotelsByCity(cityName).OrderByDescending(x => x.Price).ToList();
-            }
-            else
-            {
-                hotels = _hotelRepository.GetHotelsByCity(cityName).ToList();
-            }
-
-            return _mapper.Map<IEnumerable<Hotel>, IEnumerable<HotelViewModel>>(hotels);
+            return GetHotelViewModels(orderByPriceAsc, hotels);
         }
 
         // GET api/room
@@ -61,22 +51,16 @@ namespace WebApiRateLimiter.Controllers
             if (string.IsNullOrWhiteSpace(roomType))
                 return null;
 
-            List<Hotel> hotels = new List<Hotel>();
+            List<Hotel> hotels = _hotelRepository.GetHotelsByRoomType(roomType).ToList();
 
-            if (orderByPriceAsc.ToLower() == "asc")
-            {
-                hotels = _hotelRepository.GetHotelsByRoomType(roomType).OrderBy(x => x.Price).ToList();
-            }
-            else if (orderByPriceAsc.ToLower() == "desc")
-            {
-                hotels = _hotelRepository.GetHotelsByRoomType(roomType).OrderByDescending(x => x.Price).ToList();
-            }
-            else
-            {
-                hotels = _hotelRepository.GetHotelsByRoomType(roomType).ToList();
-            }
+            return GetHotelViewModels(orderByPriceAsc, hotels);
+        }
 
-            return _mapper.Map<IEnumerable<Hotel>, IEnumerable<HotelViewModel>>(hotels);
+        private IEnumerable<HotelViewModel> GetHotelViewModels(string orderByPriceAsc, List<Hotel> hotels)
+        {
+            var orderBy = _orderByFactory.Create(orderByPriceAsc);
+
+            return _mapper.Map<IEnumerable<Hotel>, IEnumerable<HotelViewModel>>(orderBy.Order(hotels));
         }
     }
 }
