@@ -3,7 +3,6 @@ using CVAHelper.Data.Interface;
 using CVAHelper.Data.Model;
 using CVAHelper.Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
 using System.Collections.Generic;
 using System.Linq;
 using WebApiRateLimiter.Attributes.Throttle;
@@ -15,14 +14,12 @@ namespace WebApiRateLimiter.Controllers
     [ApiController]
     public class HotelsController : ControllerBase
     {
-        private IMemoryCache _memoryCache;
         private IHotelRepository _hotelRepository;
         private readonly IMapper _mapper;
         private readonly IOrderByFactory _orderByFactory;
 
-        public HotelsController(IMemoryCache memoryCache, IHotelRepository hotelRepository, IMapper mapper, IOrderByFactory orderByFactory)
+        public HotelsController(IHotelRepository hotelRepository, IMapper mapper, IOrderByFactory orderByFactory)
         {
-            _memoryCache = memoryCache;
             _hotelRepository = hotelRepository;
             _mapper = mapper;
             _orderByFactory = orderByFactory;
