@@ -97,7 +97,7 @@ namespace WebApiRateLimiter.Attributes.Throttle
         {
             actionContext.Result = new ContentResult()
             {
-                Content = "Web API Rate Limit Exceeded."
+                Content = Constants.FORBIDDEN_CONTENT
             };
         }
 
@@ -105,13 +105,13 @@ namespace WebApiRateLimiter.Attributes.Throttle
         {
             actionContext.Result = new ContentResult()
             {
-                Content = "Web API is suspended, Please try after sometime."
+                Content = Constants.SUSPEND_CONTENT
             };
         }
 
         private string GetThrottleBaseKey(string serviceName)
         {
-            return "ThrottleBaseKey" + serviceName;
+            return Constants.THROTTLE_BASE_KEY + serviceName;
         }
     }
 }

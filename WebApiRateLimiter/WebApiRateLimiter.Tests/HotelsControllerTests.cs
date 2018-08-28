@@ -9,7 +9,7 @@ namespace WebApiRateLimiter.Tests
         [TestMethod]
         public async Task Test_HotelsController_City_WEBAPI_Is_Up()
         {
-            var response = await Client.GetAsync("api/city/bangkok");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
@@ -21,7 +21,7 @@ namespace WebApiRateLimiter.Tests
         [TestMethod]
         public async Task Test_HotelsController_Room_WEBAPI_Is_Up()
         {
-            var response = await Client.GetAsync("api/room/deluxe");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
@@ -35,15 +35,15 @@ namespace WebApiRateLimiter.Tests
         {
             for (int i = 0; i < 5; i++)
             {
-                await Client.GetAsync("api/city/bangkok");
+                await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
             }
-            var response = await Client.GetAsync("api/city/bangkok");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(result == "Web API Rate Limit Exceeded.");
+            Assert.IsTrue(result == Constants.FORBIDDEN_CONTENT);
         }
 
 
@@ -52,15 +52,15 @@ namespace WebApiRateLimiter.Tests
         {
             for (int i = 0; i < 5; i++)
             {
-                await Client.GetAsync("api/room/deluxe");
+                await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
             }
-            var response = await Client.GetAsync("api/room/deluxe");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(result == "Web API Rate Limit Exceeded.");
+            Assert.IsTrue(result == Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
@@ -68,15 +68,15 @@ namespace WebApiRateLimiter.Tests
         {
             for (int i = 0; i < 6; i++)
             {
-                await Client.GetAsync("api/city/bangkok");
+                await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
             }
-            var response = await Client.GetAsync("api/city/bangkok");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(result == "Web API is suspended, Please try after sometime.");
+            Assert.IsTrue(result == Constants.SUSPEND_CONTENT);
         }
 
         [TestMethod]
@@ -84,15 +84,15 @@ namespace WebApiRateLimiter.Tests
         {
             for (int i = 0; i < 6; i++)
             {
-                await Client.GetAsync("api/room/deluxe");
+                await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
             }
-            var response = await Client.GetAsync("api/room/deluxe");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(result == "Web API is suspended, Please try after sometime.");
+            Assert.IsTrue(result == Constants.SUSPEND_CONTENT);
         }
 
         [TestMethod]
@@ -100,15 +100,15 @@ namespace WebApiRateLimiter.Tests
         {
             for (int i = 0; i < 6; i++)
             {
-                await Client.GetAsync("api/city/bangkok");
+                await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
             }
-            var response = await Client.GetAsync("api/room/deluxe");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsFalse(result != "Web API Rate Limit Exceeded.");
+            Assert.IsFalse(result != Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
@@ -116,15 +116,15 @@ namespace WebApiRateLimiter.Tests
         {
             for (int i = 0; i < 6; i++)
             {
-                await Client.GetAsync("api/city/deluxe");
+                await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
             }
-            var response = await Client.GetAsync("api/city/bangkok");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsFalse(result != "Web API Rate Limit Exceeded.");
+            Assert.IsFalse(result != Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
@@ -132,15 +132,15 @@ namespace WebApiRateLimiter.Tests
         {
             for (int i = 0; i < 6; i++)
             {
-                await Client.GetAsync("api/city/bangkok");
+                await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
             }
-            var response = await Client.GetAsync("api/room/deluxe");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsFalse(result != "Web API is suspended, Please try after sometime.");
+            Assert.IsFalse(result != Constants.SUSPEND_CONTENT);
         }
 
         [TestMethod]
@@ -148,15 +148,15 @@ namespace WebApiRateLimiter.Tests
         {
             for (int i = 0; i < 6; i++)
             {
-                await Client.GetAsync("api/city/deluxe");
+                await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
             }
-            var response = await Client.GetAsync("api/city/bangkok");
+            var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsFalse(result != "Web API is suspended, Please try after sometime.");
+            Assert.IsFalse(result != Constants.SUSPEND_CONTENT);
         }
 
     }
