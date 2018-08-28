@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Swagger;
 using WebApiRateLimiter.Helpers.Factory;
 using WebApiRateLimiter.Helpers.Interface;
 
@@ -35,6 +36,10 @@ namespace WebApiRateLimiter
             services.AddAutoMapper();
             services.AddMemoryCache();
             services.Configure<ApiRateLimitPolicies>(Configuration.GetSection("ApiRateLimitPolicies"));
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Web API Rate Limiter", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +55,16 @@ namespace WebApiRateLimiter
             }
 
             app.UseHttpsRedirection();
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), 
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Web API Rate Limiter V1");
+                c.RoutePrefix = string.Empty;
+            });
             app.UseMvc();
         }
     }
