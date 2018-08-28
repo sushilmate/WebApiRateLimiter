@@ -11,21 +11,11 @@ namespace WebApiRateLimiter.Helpers.Factory
         {
             switch (orderByPriceAsc)
             {
-                case "asc":
-                    return new OrderByAscending();
                 case "desc":
                     return new OrderByDescending();
                 default:
-                    return new NoOrder();
+                    return new OrderByAscending();
             }
-        }
-    }
-
-    internal class NoOrder : IOrderBy
-    {
-        public IEnumerable<Hotel> Order(IEnumerable<Hotel> hotel)
-        {
-            return hotel;
         }
     }
 

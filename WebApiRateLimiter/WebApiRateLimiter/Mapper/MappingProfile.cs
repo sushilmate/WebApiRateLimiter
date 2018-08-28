@@ -8,6 +8,7 @@ namespace WebApiRateLimiter
     {
         public MappingProfile()
         {
+            // creating mapping with hotel model with hotel view model.
             CreateMap<Hotel, HotelViewModel>();
         }
     }
