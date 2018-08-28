@@ -13,6 +13,7 @@ namespace WebApiRateLimiter.Helpers.Factory
             {
                 case "desc":
                     return new OrderByDescending();
+
                 default:
                     return new OrderByAscending();
             }

@@ -81,7 +81,7 @@ namespace WebApiRateLimiter.Controllers
         private IEnumerable<HotelViewModel> GetHotelViewModels(string orderByPriceAsc, List<Hotel> hotels)
         {
             var orderBy = _orderByFactory.Create(orderByPriceAsc);
-            // mapper maps the model to viewmodel or viewmodel to model. 
+            // mapper maps the model to viewmodel or viewmodel to model.
             return _mapper.Map<IEnumerable<Hotel>, IEnumerable<HotelViewModel>>(orderBy.Order(hotels));
         }
     }

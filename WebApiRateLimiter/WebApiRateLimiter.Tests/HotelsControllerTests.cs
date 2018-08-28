@@ -46,7 +46,6 @@ namespace WebApiRateLimiter.Tests
             Assert.IsTrue(result == Constants.FORBIDDEN_CONTENT);
         }
 
-
         [TestMethod]
         public async Task Test_Get_Hotels_By_Room_Limit_Rate_Exceeded()
         {
