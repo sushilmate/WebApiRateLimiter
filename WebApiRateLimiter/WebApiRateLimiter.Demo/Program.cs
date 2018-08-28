@@ -1,44 +1,27 @@
 ﻿using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
 
 namespace WebApiRateLimiter.Demo
 {
-    class Program
+
+    namespace OwinSelfhostSample
     {
-        static HttpClient client = new HttpClient();
-        static void Main(string[] args)
+        public class Program
         {
-            RunAsync().GetAwaiter().GetResult();
-        }
-        static async Task RunAsync()
-        {
-            // Update port # in the following line.
-            client.BaseAddress = new Uri("http://localhost:63131/");
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            try
+            static void Main()
             {
-                await GetProductAsync("");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+                string baseAddress = "http://localhost:63131/";
 
-            Console.ReadLine();
-        }
+                // Create HttpCient and make a request to api/values 
+                HttpClient client = new HttpClient();
+                
 
-        static async Task GetProductAsync(string path)
-        {
-            HttpResponseMessage response = await client.GetAsync(path);
-            if (response.IsSuccessStatusCode)
-            {
+                var response = client.GetAsync(baseAddress + "api/city/bangkok").Result;
+
+                Console.WriteLine(response);
+                Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+                Console.ReadLine();
             }
         }
-
     }
 }
