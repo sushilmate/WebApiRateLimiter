@@ -108,7 +108,7 @@ namespace WebApiRateLimiter.Tests
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsFalse(result != Constants.FORBIDDEN_CONTENT);
+            Assert.IsTrue(result != Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
@@ -124,7 +124,7 @@ namespace WebApiRateLimiter.Tests
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsFalse(result != Constants.FORBIDDEN_CONTENT);
+            Assert.IsTrue(result != Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
@@ -140,7 +140,7 @@ namespace WebApiRateLimiter.Tests
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsFalse(result != Constants.SUSPEND_CONTENT);
+            Assert.IsTrue(result != Constants.SUSPEND_CONTENT);
         }
 
         [TestMethod]
@@ -156,8 +156,7 @@ namespace WebApiRateLimiter.Tests
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsFalse(result != Constants.SUSPEND_CONTENT);
+            Assert.IsTrue(result != Constants.SUSPEND_CONTENT);
         }
-
     }
 }

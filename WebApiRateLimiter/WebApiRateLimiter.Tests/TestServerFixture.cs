@@ -16,7 +16,7 @@ namespace WebApiRateLimiter.Tests
         {
             var builder = new WebHostBuilder()
                    .UseContentRoot(GetContentRootPath())
-                   .UseEnvironment("Development")
+                   .UseEnvironment("Testing")
                    .UseStartup<Startup>();  // Uses Start up class from your API Host project to configure the test server
 
             _testServer = new TestServer(builder);
