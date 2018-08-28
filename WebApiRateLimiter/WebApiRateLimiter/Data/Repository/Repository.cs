@@ -1,9 +1,14 @@
-﻿using WebApiRateLimiter.Data.Interface;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using WebApiRateLimiter.Data.Interface;
 
 namespace WebApiRateLimiter.Data.Repository
 {
+    /// <summary>
+    /// Empty Repository base class
+    /// when we connect to db then we will write the actual methods.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Repository<T> : IRepository<T> where T : class
     {
         public Repository()

@@ -3,80 +3,71 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using System;
 using System.Linq;
+using WebApiRateLimiter.Helpers.Interface;
+using WebApiRateLimiter.Helpers.Providers;
 
 namespace WebApiRateLimiter.Attributes.Throttle
 {
     public class ThrottleApiRateAttribute : ActionFilterAttribute
     {
         private readonly object syncLock = new object();
-        private IMemoryCache _cache;
-        private IOptions<ApiRateLimitPolicies> _options;
-        private string _serviceName;
+        private readonly string _serviceName;
+        private readonly IMemoryCache _cache;
+        private readonly IOptions<ApiRateLimitPolicies> _options;
+        private readonly ICacheSettingProvider _cacheSettingProvider;
 
-        public ThrottleApiRateAttribute(string serviceName, IMemoryCache cache, IOptions<ApiRateLimitPolicies> options)
+        /// <summary>
+        /// Throttle Attribute used to limit the web api calls
+        /// decorate the web api with ThrottleApiRateAttribute to limit the web api calls
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <param name="cache"></param>
+        /// <param name="options"></param>
+        /// <param name="cacheSettingProvider"></param>
+        public ThrottleApiRateAttribute(string serviceName, IMemoryCache cache, IOptions<ApiRateLimitPolicies> options, ICacheSettingProvider cacheSettingProvider)
         {
             _serviceName = serviceName;
             _cache = cache;
             _options = options;
+            _cacheSettingProvider = cacheSettingProvider;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            // lock to synchronise the multiple calls on web apis.
             lock (syncLock)
             {
-                var apiLimitRuleDetails = _options.Value.Rules.FirstOrDefault(x => x.Endpoint == _serviceName);
-                if (apiLimitRuleDetails == null)
-                    apiLimitRuleDetails = GetDefaultLimitRateValues();
+                // read api limit rules from config or by default limit rules
+                var apiLimitRuleDetails = _options.Value.Rules.FirstOrDefault(x => x.Endpoint == _serviceName) ?? GetDefaultLimitRateValues();
 
-                if (_cache.Get(GetThrottleBaseKey(_serviceName)) == null)
+                // throttle cache is present means service threshold is reached, need to suspend the request.
+                if (_cache.Get(GetThrottleBaseKey(_serviceName)) != null)
                 {
-                    if (!_cache.TryGetValue(_serviceName, out CacheType serviceHitCounter))
-                    {
-                        serviceHitCounter = new CacheType
-                        {
-                            ExpiresAt = DateTime.Now.AddSeconds(apiLimitRuleDetails.Period),
-                            Counter = 1
-                        };
-
-                        // Set cache options.
-                        var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        {
-                            Priority = CacheItemPriority.High,
-                            AbsoluteExpiration = serviceHitCounter.ExpiresAt
-                        };
-
-                        // Save data in cache.
-                        _cache.Set(_serviceName, serviceHitCounter, cacheEntryOptions);
-                    }
-                    else
-                    {
-                        if (serviceHitCounter.Counter < apiLimitRuleDetails.Limit)
-                        {
-                            serviceHitCounter.Counter++;
-                            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                            {
-                                Priority = CacheItemPriority.High,
-                                AbsoluteExpiration = serviceHitCounter.ExpiresAt
-                            };
-                            _cache.Set(_serviceName, serviceHitCounter, cacheEntryOptions);
-                        }
-                        else
-                        {
-                            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                            {
-                                Priority = CacheItemPriority.High,
-                                AbsoluteExpiration = DateTime.Now.AddSeconds(apiLimitRuleDetails.SuspendPeriod)
-                            };
-                            _cache.Set(GetThrottleBaseKey(_serviceName), true, cacheEntryOptions);
-                            Forbidden(context);
-                        }
-                    }
+                    Suspend(context);
                 }
                 else
                 {
-                    Forbidden(context);
+                    if (!_cache.TryGetValue(_serviceName, out CacheSetting serviceHitCounter))
+                    {
+                        // create service hit counter with 1
+                        CreateOrUpdateCache(_serviceName, _cacheSettingProvider.CreateCacheSetting(apiLimitRuleDetails.Period));
+                    }
+                    else
+                    {
+                        // as long as threshold is not reached just increment the counter and update the service cache counter
+                        if (serviceHitCounter.Value < apiLimitRuleDetails.Limit)
+                        {
+                            serviceHitCounter.Value++;
+                            CreateOrUpdateCache(_serviceName, serviceHitCounter);
+                        }
+                        else
+                        {
+                            // api limit threshold is reached, need to add throttle cache in the memory to suspend subsequent calls to api for particular duration
+                            CreateOrUpdateCache(GetThrottleBaseKey(_serviceName), _cacheSettingProvider.CreateCacheSetting(apiLimitRuleDetails.SuspendPeriod));
+                            Forbidden(context);
+                        }
+                    }
                 }
                 base.OnActionExecuting(context);
             }
@@ -87,16 +78,34 @@ namespace WebApiRateLimiter.Attributes.Throttle
             return new RateLimitRule()
             {
                 DefaultLimit = 50,
+                Limit = 50,
                 DefaultPeriod = 10,
                 SuspendPeriod = 10
             };
+        }
+
+        private void CreateOrUpdateCache(string cacheName, CacheSetting cacheSetting)
+        {
+            // Set cache options.
+            var cacheEntryOptions = _cacheSettingProvider.CreateMemoryCacheEntryOptions(CacheItemPriority.High, cacheSetting.ExpiresAt);
+
+            // Save data in cache.
+            _cache.Set(cacheName, cacheSetting, cacheEntryOptions);
         }
 
         private void Forbidden(ActionExecutingContext actionContext)
         {
             actionContext.Result = new ContentResult()
             {
-                Content = "Web API Rate Limit Exceeded"
+                Content = "Web API Rate Limit Exceeded."
+            };
+        }
+
+        private void Suspend(ActionExecutingContext actionContext)
+        {
+            actionContext.Result = new ContentResult()
+            {
+                Content = "Web API is suspended, Please try after sometime."
             };
         }
 
@@ -104,11 +113,5 @@ namespace WebApiRateLimiter.Attributes.Throttle
         {
             return "ThrottleBaseKey" + serviceName;
         }
-    }
-
-    internal class CacheType
-    {
-        public DateTime ExpiresAt { get; set; }
-        public int Counter { get; set; }
     }
 }

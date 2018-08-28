@@ -1,8 +1,8 @@
-﻿using WebApiRateLimiter.Data.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using WebApiRateLimiter.Data.Model;
 
 namespace WebApiRateLimiter.Data.DatabaseContext
 {

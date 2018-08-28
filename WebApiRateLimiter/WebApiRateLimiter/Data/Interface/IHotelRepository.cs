@@ -1,13 +1,11 @@
-﻿using WebApiRateLimiter.Data.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using WebApiRateLimiter.Data.Model;
 
 namespace WebApiRateLimiter.Data.Interface
 {
     public interface IHotelRepository : IRepository<Hotel>
     {
         IEnumerable<Hotel> GetAllHotels();
-
-        bool UpdateOrAddMapping(IEnumerable<Hotel> gidGsrMappings);
 
         IEnumerable<Hotel> GetHotelsByCity(string city);
 

@@ -1,6 +1,6 @@
-﻿using WebApiRateLimiter.Data.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using WebApiRateLimiter.Data.Model;
 using WebApiRateLimiter.Helpers.Interface;
 
 namespace WebApiRateLimiter.Helpers.Factory
@@ -11,12 +11,21 @@ namespace WebApiRateLimiter.Helpers.Factory
         {
             switch (orderByPriceAsc)
             {
+                case "asc":
+                    return new OrderByAscending();
                 case "desc":
                     return new OrderByDescending();
-
                 default:
-                    return new OrderByAscending();
+                    return new NoOrder();
             }
+        }
+    }
+
+    internal class NoOrder : IOrderBy
+    {
+        public IEnumerable<Hotel> Order(IEnumerable<Hotel> hotel)
+        {
+            return hotel;
         }
     }
 

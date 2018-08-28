@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using WebApiRateLimiter.Data.Interface;
-using WebApiRateLimiter.Data.Model;
-using WebApiRateLimiter.Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
 using WebApiRateLimiter.Attributes.Throttle;
+using WebApiRateLimiter.Data.Interface;
+using WebApiRateLimiter.Data.Model;
+using WebApiRateLimiter.Data.ViewModel;
 using WebApiRateLimiter.Helpers.Interface;
 
 namespace WebApiRateLimiter.Controllers
@@ -56,7 +56,7 @@ namespace WebApiRateLimiter.Controllers
         private IEnumerable<HotelViewModel> GetHotelViewModels(string orderByPriceAsc, List<Hotel> hotels)
         {
             var orderBy = _orderByFactory.Create(orderByPriceAsc);
-
+            // mapper maps the model to viewmodel or viewmodel to model. 
             return _mapper.Map<IEnumerable<Hotel>, IEnumerable<HotelViewModel>>(orderBy.Order(hotels));
         }
     }

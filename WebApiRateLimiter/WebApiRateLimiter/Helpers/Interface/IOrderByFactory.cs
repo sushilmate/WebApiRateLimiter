@@ -1,5 +1,5 @@
-﻿using WebApiRateLimiter.Data.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using WebApiRateLimiter.Data.Model;
 
 namespace WebApiRateLimiter.Helpers.Interface
 {
