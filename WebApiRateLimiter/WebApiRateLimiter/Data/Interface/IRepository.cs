@@ -1,4 +1,4 @@
-﻿namespace CVAHelper.Data.Interface
+﻿namespace WebApiRateLimiter.Data.Interface
 {
     using System.Collections.Generic;
 

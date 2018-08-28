@@ -1,10 +1,10 @@
-﻿using CVAHelper.Data.Model;
+﻿using WebApiRateLimiter.Data.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace CVAHelper.Data.DatabaseContext
+namespace WebApiRateLimiter.Data.DatabaseContext
 {
     public static class AgodaDbContext
     {

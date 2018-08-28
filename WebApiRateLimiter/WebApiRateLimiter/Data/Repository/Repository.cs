@@ -1,8 +1,8 @@
-﻿using CVAHelper.Data.Interface;
+﻿using WebApiRateLimiter.Data.Interface;
 using System;
 using System.Collections.Generic;
 
-namespace CVAHelper.Data.Repository
+namespace WebApiRateLimiter.Data.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {

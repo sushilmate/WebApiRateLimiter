@@ -1,4 +1,4 @@
-﻿namespace CVAHelper.Data.Model
+﻿namespace WebApiRateLimiter.Data.Model
 {
     /// <summary>
     /// Holel Model

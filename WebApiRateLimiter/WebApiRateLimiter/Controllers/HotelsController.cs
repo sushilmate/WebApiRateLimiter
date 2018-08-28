@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using CVAHelper.Data.Interface;
-using CVAHelper.Data.Model;
-using CVAHelper.Data.ViewModel;
+using WebApiRateLimiter.Data.Interface;
+using WebApiRateLimiter.Data.Model;
+using WebApiRateLimiter.Data.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;

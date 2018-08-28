@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using CVAHelper.Data.Model;
-using CVAHelper.Data.ViewModel;
+using WebApiRateLimiter.Data.Model;
+using WebApiRateLimiter.Data.ViewModel;
 
 namespace WebApiRateLimiter
 {

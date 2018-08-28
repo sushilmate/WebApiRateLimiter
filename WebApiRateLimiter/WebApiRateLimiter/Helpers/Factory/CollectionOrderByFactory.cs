@@ -1,4 +1,4 @@
-﻿using CVAHelper.Data.Model;
+﻿using WebApiRateLimiter.Data.Model;
 using System.Collections.Generic;
 using System.Linq;
 using WebApiRateLimiter.Helpers.Interface;

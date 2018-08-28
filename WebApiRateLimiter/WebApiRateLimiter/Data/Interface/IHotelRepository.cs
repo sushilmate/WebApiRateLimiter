@@ -1,7 +1,7 @@
-﻿using CVAHelper.Data.Model;
+﻿using WebApiRateLimiter.Data.Model;
 using System.Collections.Generic;
 
-namespace CVAHelper.Data.Interface
+namespace WebApiRateLimiter.Data.Interface
 {
     public interface IHotelRepository : IRepository<Hotel>
     {

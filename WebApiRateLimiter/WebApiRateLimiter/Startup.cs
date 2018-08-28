@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using CVAHelper.Data.Interface;
-using CVAHelper.Data.Repository;
+using WebApiRateLimiter.Data.Interface;
+using WebApiRateLimiter.Data.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;

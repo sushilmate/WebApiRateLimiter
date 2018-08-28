@@ -1,10 +1,10 @@
-﻿using CVAHelper.Data.DatabaseContext;
-using CVAHelper.Data.Interface;
-using CVAHelper.Data.Model;
+﻿using WebApiRateLimiter.Data.DatabaseContext;
+using WebApiRateLimiter.Data.Interface;
+using WebApiRateLimiter.Data.Model;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CVAHelper.Data.Repository
+namespace WebApiRateLimiter.Data.Repository
 {
     public class HotelRepository : Repository<Hotel>, IHotelRepository
     {

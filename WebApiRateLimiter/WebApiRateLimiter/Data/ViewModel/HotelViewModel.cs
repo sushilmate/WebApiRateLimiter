@@ -1,4 +1,4 @@
-﻿namespace CVAHelper.Data.ViewModel
+﻿namespace WebApiRateLimiter.Data.ViewModel
 {
     /// <summary>
     /// ViewModel for Hotel Entity Model
