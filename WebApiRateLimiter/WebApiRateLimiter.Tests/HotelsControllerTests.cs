@@ -1,5 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using WebApiRateLimiter.Data.Model;
 
 namespace WebApiRateLimiter.Tests
 {
@@ -7,27 +11,110 @@ namespace WebApiRateLimiter.Tests
     public class HotelsControllerTests : TestServerFixture
     {
         [TestMethod]
-        public async Task Test_HotelsController_City_WEBAPI_Is_Up()
+        public async Task Test_HotelsController_City_WEBAPI_Is_Ok()
         {
             var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
-            var responseStrong = await response.Content.ReadAsStringAsync();
-
-            Assert.IsFalse(string.IsNullOrWhiteSpace(responseStrong.ToString()));
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
         }
 
-        [TestMethod]
-        public async Task Test_HotelsController_Room_WEBAPI_Is_Up()
+        public async Task Test_HotelsController_Room_WEBAPI_Is_Ok()
         {
             var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
 
             response.EnsureSuccessStatusCode();
 
-            var responseStrong = await response.Content.ReadAsStringAsync();
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
+        }
 
-            Assert.IsFalse(string.IsNullOrWhiteSpace(responseStrong.ToString()));
+        [TestMethod]
+        public async Task Test_HotelsController_City_WEBAPI_Is_Returns_Hotel()
+        {
+            var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var hotels = JsonConvert.DeserializeObject<IEnumerable<Hotel>>(result);
+
+            Assert.IsTrue(hotels.Count() != 0);
+        }
+
+        [TestMethod]
+        public async Task Test_HotelsController_Room_WEBAPI_Is_Returns_Hotel()
+        {
+            var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var hotels = JsonConvert.DeserializeObject<IEnumerable<Hotel>>(result);
+
+            Assert.IsTrue(hotels.Count() != 0);
+        }
+
+        [TestMethod]
+        public async Task Test_HotelsController_City_WEBAPI_Is_Returns_Hotels_Sorted_Asc_By_Price()
+        {
+            var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL + "/asc");
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var hotels = JsonConvert.DeserializeObject<IEnumerable<Hotel>>(result).ToList();
+
+            Assert.IsTrue(hotels.Min(x => x.Price) == hotels.First().Price);
+            Assert.IsTrue(hotels.Max(x => x.Price) == hotels.Last().Price);
+        }
+
+        [TestMethod]
+        public async Task Test_HotelsController_City_WEBAPI_Is_Returns_Hotels_Sorted_Desc_By_Price()
+        {
+            var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL + "/desc");
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var hotels = JsonConvert.DeserializeObject<IEnumerable<Hotel>>(result).ToList();
+
+            Assert.IsTrue(hotels.Min(x => x.Price) == hotels.Last().Price);
+            Assert.IsTrue(hotels.Max(x => x.Price) == hotels.First().Price);
+        }
+
+        [TestMethod]
+        public async Task Test_HotelsController_Room_WEBAPI_Is_Returns_Hotels_Sorted_Asc_By_Price()
+        {
+            var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL + "/asc");
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var hotels = JsonConvert.DeserializeObject<IEnumerable<Hotel>>(result).ToList();
+
+            Assert.IsTrue(hotels.Min(x => x.Price) == hotels.First().Price);
+            Assert.IsTrue(hotels.Max(x => x.Price) == hotels.Last().Price);
+        }
+
+        [TestMethod]
+        public async Task Test_HotelsController_Room_WEBAPI_Is_Returns_Hotels_Sorted_Desc_By_Price()
+        {
+            var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL + "/desc");
+
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content.ReadAsStringAsync();
+
+            var hotels = JsonConvert.DeserializeObject<IEnumerable<Hotel>>(result).ToList();
+
+            Assert.IsTrue(hotels.Min(x => x.Price) == hotels.Last().Price);
+            Assert.IsTrue(hotels.Max(x => x.Price) == hotels.First().Price);
         }
 
         [TestMethod]
