@@ -20,6 +20,7 @@ namespace WebApiRateLimiter.Tests
             Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.OK);
         }
 
+        [TestMethod]
         public async Task Test_HotelsController_Room_WEBAPI_Is_Ok()
         {
             var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
@@ -243,6 +244,14 @@ namespace WebApiRateLimiter.Tests
             var result = await response.Content.ReadAsStringAsync();
 
             Assert.IsTrue(result != Constants.SUSPEND_CONTENT);
+        }
+
+        [TestMethod]
+        public async Task Test_Hotels_Services_Failing_Due_To_Wrong_End_Point()
+        {
+            var response = await Client.GetAsync("api/abc");
+
+            Assert.IsTrue(response.StatusCode == System.Net.HttpStatusCode.NotFound);
         }
     }
 }
