@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using WebApiRateLimiter.Data.DatabaseContext;
 using WebApiRateLimiter.Data.Interface;
@@ -19,12 +20,12 @@ namespace WebApiRateLimiter.Data.Repository
 
         public IEnumerable<Hotel> GetHotelsByCity(string city)
         {
-            return AgodaDbContext.Hotels.Where(x => x.City.ToLower() == city.ToLower());
+            return AgodaDbContext.Hotels.Where(x => string.Equals(city, x.City, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public IEnumerable<Hotel> GetHotelsByRoomType(string roomType)
         {
-            return AgodaDbContext.Hotels.Where(x => x.Room.ToLower() == roomType.ToLower());
+            return AgodaDbContext.Hotels.Where(x => string.Equals(roomType, x.Room, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

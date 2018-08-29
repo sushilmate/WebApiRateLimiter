@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Linq;
 using WebApiRateLimiter.Helpers.Interface;
@@ -16,6 +17,7 @@ namespace WebApiRateLimiter.Attributes.Throttle
         private readonly IMemoryCache _cache;
         private readonly IOptions<ApiRateLimitPolicies> _options;
         private readonly ICacheSettingProvider _cacheSettingProvider;
+        private readonly ILogger<ThrottleApiRateAttribute> _logger;
 
         /// <summary>
         /// Throttle Attribute used to limit the web api calls
@@ -25,12 +27,14 @@ namespace WebApiRateLimiter.Attributes.Throttle
         /// <param name="cache"></param>
         /// <param name="options"></param>
         /// <param name="cacheSettingProvider"></param>
-        public ThrottleApiRateAttribute(string serviceName, IMemoryCache cache, IOptions<ApiRateLimitPolicies> options, ICacheSettingProvider cacheSettingProvider)
+        /// <param name="logger"></param>
+        public ThrottleApiRateAttribute(string serviceName, IMemoryCache cache, IOptions<ApiRateLimitPolicies> options, ICacheSettingProvider cacheSettingProvider, ILogger<ThrottleApiRateAttribute> logger)
         {
             _serviceName = serviceName;
             _cache = cache;
             _options = options;
             _cacheSettingProvider = cacheSettingProvider;
+            _logger = logger;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -44,6 +48,7 @@ namespace WebApiRateLimiter.Attributes.Throttle
                 // throttle cache is present means service threshold is reached, need to suspend the request.
                 if (_cache.Get(GetThrottleBaseKey(_serviceName)) != null)
                 {
+                    _logger.LogWarning("Request has been suspended for User " + context.HttpContext.User);
                     Suspend(context);
                 }
                 else
@@ -65,6 +70,7 @@ namespace WebApiRateLimiter.Attributes.Throttle
                         {
                             // api limit threshold is reached, need to add throttle cache in the memory to suspend subsequent calls to api for particular duration
                             CreateOrUpdateCache(GetThrottleBaseKey(_serviceName), _cacheSettingProvider.CreateCacheSetting(apiLimitRuleDetails.SuspendPeriod));
+                            _logger.LogWarning("Request has been forbidden for User " + context.HttpContext.User);
                             Forbidden(context);
                         }
                     }
