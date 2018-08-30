@@ -80,6 +80,8 @@ namespace WebApiRateLimiter
                 c.RoutePrefix = string.Empty;
             });
 
+            app.UseApiRateLimitMiddleware();
+
             app.UseMvc();
         }
     }
