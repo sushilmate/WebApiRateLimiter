@@ -9,6 +9,7 @@ namespace WebApiRateLimiter
 
     public class RateLimitRule
     {
+        public string EndPointKey { get; set; }
         public string Endpoint { get; set; }
         public int Period { get; set; }
         public int DefaultPeriod { get; set; }

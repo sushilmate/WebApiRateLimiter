@@ -8,8 +8,6 @@
 
         public const string FORBIDDEN_CONTENT = "Web API Rate Limit Exceeded.";
 
-        public const string SUSPEND_CONTENT = "Web API is suspended, Please try after sometime.";
-
         public const string THROTTLE_BASE_KEY = "ThrottleBaseKey";
     }
 }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
-using WebApiRateLimiter.Attributes.Throttle;
 using WebApiRateLimiter.Data.Interface;
 using WebApiRateLimiter.Data.Model;
 using WebApiRateLimiter.Data.ViewModel;
@@ -15,7 +14,7 @@ namespace WebApiRateLimiter.Controllers
     [ApiController]
     public class HotelsController : ControllerBase
     {
-        private IHotelRepository _hotelRepository;
+        private readonly IHotelRepository _hotelRepository;
         private readonly IMapper _mapper;
         private readonly IOrderByFactory _orderByFactory;
         private readonly ILogger<HotelsController> _logger;
@@ -29,14 +28,13 @@ namespace WebApiRateLimiter.Controllers
         }
 
         [HttpGet("city/{cityName}")]
-        [TypeFilter(typeof(ThrottleApiRateAttribute), Arguments = new object[] { "GetHotelsByCity" })]
         public IEnumerable<HotelViewModel> GetHotelsByCity(string cityName)
         {
-            _logger.LogInformation(LoggingEvents.GetItem, "Get Hotel By City {cityName}", cityName);
+            _logger.LogInformation(LoggingEvents.GetItem, LoggingMessages.GetHotelByCity, cityName);
 
             if (string.IsNullOrWhiteSpace(cityName))
             {
-                _logger.LogWarning(LoggingEvents.ParameterNotProvided, "Get Hotel By City without parameter");
+                _logger.LogWarning(LoggingEvents.ParameterNotProvided, LoggingMessages.GetHotelByCityWithoutParameter);
                 return null;
             }
             var hotels = _hotelRepository.GetHotelsByCity(cityName);
@@ -48,14 +46,13 @@ namespace WebApiRateLimiter.Controllers
         // can have multiple routes here but swagger showing optional parameter as mandatory field so created new api
         //[HttpGet("city/{cityName}")]
         [HttpGet("city/{cityName}/{orderByPriceAsc}")]
-        [TypeFilter(typeof(ThrottleApiRateAttribute), Arguments = new object[] { "GetHotelsByCity" })]
         public IEnumerable<HotelViewModel> GetHotelsByCity(string cityName, string orderByPriceAsc)
         {
-            _logger.LogInformation(LoggingEvents.GetItem, "Get Hotel By City {cityName} & order by price {orderByPriceAsc}", cityName, orderByPriceAsc);
+            _logger.LogInformation(LoggingEvents.GetItem, LoggingMessages.GetHotelByCityOrderByPrice, cityName, orderByPriceAsc);
 
             if (string.IsNullOrWhiteSpace(cityName))
             {
-                _logger.LogWarning(LoggingEvents.ParameterNotProvided, "Get Hotel By City without parameter");
+                _logger.LogWarning(LoggingEvents.ParameterNotProvided, LoggingMessages.GetHotelByCityWithoutParameter);
                 return null;
             }
 
@@ -65,14 +62,13 @@ namespace WebApiRateLimiter.Controllers
         }
 
         [HttpGet("room/{roomType}")]
-        [TypeFilter(typeof(ThrottleApiRateAttribute), Arguments = new object[] { "GetHotelsByRoomType" })]
         public IEnumerable<HotelViewModel> GetHotelsByRoomType(string roomType)
         {
-            _logger.LogInformation(LoggingEvents.GetItem, "Get Hotel By Room {roomType}", roomType);
+            _logger.LogInformation(LoggingEvents.GetItem, LoggingMessages.GetHotelByRoom, roomType);
 
             if (string.IsNullOrWhiteSpace(roomType))
             {
-                _logger.LogWarning(LoggingEvents.ParameterNotProvided, "Get Hotel By Room without parameter");
+                _logger.LogWarning(LoggingEvents.ParameterNotProvided, LoggingMessages.GetHotelByRoomWithoutParameter);
                 return null;
             }
             List<Hotel> hotels = _hotelRepository.GetHotelsByRoomType(roomType).ToList();
@@ -83,14 +79,13 @@ namespace WebApiRateLimiter.Controllers
         // GET api/room
         //[HttpGet("room/{roomType}")]
         [HttpGet("room/{roomType}/{orderByPriceAsc}")]
-        [TypeFilter(typeof(ThrottleApiRateAttribute), Arguments = new object[] { "GetHotelsByRoomType" })]
         public IEnumerable<HotelViewModel> GetHotelsByRoomType(string roomType, string orderByPriceAsc)
         {
-            _logger.LogInformation(LoggingEvents.GetItem, "Get Hotel By Room {roomType} and order by price {orderByPriceAsc}", roomType, orderByPriceAsc);
+            _logger.LogInformation(LoggingEvents.GetItem, LoggingMessages.GetHotelByRoomOrderByPrice, roomType, orderByPriceAsc);
 
             if (string.IsNullOrWhiteSpace(roomType))
             {
-                _logger.LogWarning(LoggingEvents.ParameterNotProvided, "Get Hotel By Room without parameter");
+                _logger.LogWarning(LoggingEvents.ParameterNotProvided, LoggingMessages.GetHotelByRoomWithoutParameter);
                 return null;
             }
 

@@ -2,10 +2,8 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
-using WebApiRateLimiter.Attributes.Throttle;
 using WebApiRateLimiter.Helpers.Interface;
 using WebApiRateLimiter.Helpers.Providers;
 
@@ -18,10 +16,10 @@ namespace WebApiRateLimiter
         private readonly IMemoryCache _cache;
         private readonly IOptions<ApiRateLimitPolicies> _options;
         private readonly ICacheSettingProvider _cacheSettingProvider;
-        private readonly ILogger<ThrottleApiRateAttribute> _logger;
+        private readonly ILogger<ApiRateLimitMiddleware> _logger;
 
         public ApiRateLimitMiddleware(RequestDelegate next, IMemoryCache cache, IOptions<ApiRateLimitPolicies> options,
-            ICacheSettingProvider cacheSettingProvider, ILogger<ThrottleApiRateAttribute> logger)
+            ICacheSettingProvider cacheSettingProvider, ILogger<ApiRateLimitMiddleware> logger)
         {
             _next = next;
             _cache = cache;
@@ -34,7 +32,7 @@ namespace WebApiRateLimiter
         {
             if (IsRequestForbidden(context))
             {
-                _logger.LogWarning("Request has been forbidden for User " + context.User);
+                _logger.LogWarning(LoggingMessages.Forbidden + context.User);
                 await Forbidden(context);
                 return;
             }
@@ -46,43 +44,49 @@ namespace WebApiRateLimiter
             // lock to synchronise the multiple calls on web apis.
             lock (_syncLock)
             {
-                var endPoint = context.Request.Path.Value;
                 // read api limit rules from config or by default limit rules
-                var apiLimitRuleDetails = _options.Value.Rules.FirstOrDefault(x => endPoint.ToLowerInvariant().Contains(x.Endpoint.ToLowerInvariant()))
-                                                                                ?? GetDefaultLimitRateValues();
+                var apiLimitRuleDetails = GetApiLimitRuleDetails(context);
 
                 // throttle cache is present means service threshold is reached, need to suspend the request.
-                if (_cache.Get(GetThrottleBaseKey(endPoint)) != null)
+                if (_cache.Get(GetThrottleBaseKey(apiLimitRuleDetails.EndPointKey)) != null)
                 {
                     return true;
                 }
-                if (!_cache.TryGetValue(endPoint, out CacheSetting serviceHitCounter))
+                if (!_cache.TryGetValue(apiLimitRuleDetails.EndPointKey, out CacheSetting serviceHitCounter))
                 {
                     // create service hit counter with 1
-                    CreateOrUpdateCache(endPoint, _cacheSettingProvider.CreateCacheSetting(apiLimitRuleDetails.Period));
+                    CreateOrUpdateCache(apiLimitRuleDetails.EndPointKey, _cacheSettingProvider.CreateCacheSetting(apiLimitRuleDetails.Period));
                     return false;
                 }
                 // as long as threshold is not reached just increment the counter and update the service cache counter
                 if (serviceHitCounter.Value < apiLimitRuleDetails.Limit)
                 {
                     serviceHitCounter.Value++;
-                    CreateOrUpdateCache(endPoint, serviceHitCounter);
+                    CreateOrUpdateCache(apiLimitRuleDetails.EndPointKey, serviceHitCounter);
                     return false;
                 }
                 // api limit threshold is reached, need to add throttle cache in the memory to suspend subsequent calls to api for particular duration
-                CreateOrUpdateCache(GetThrottleBaseKey(endPoint), _cacheSettingProvider.CreateCacheSetting(apiLimitRuleDetails.SuspendPeriod));
+                CreateOrUpdateCache(GetThrottleBaseKey(apiLimitRuleDetails.EndPointKey), _cacheSettingProvider.CreateCacheSetting(apiLimitRuleDetails.SuspendPeriod));
                 return true;
             }
         }
 
-        private RateLimitRule GetDefaultLimitRateValues()
+        private RateLimitRule GetApiLimitRuleDetails(HttpContext context)
+        {
+            var endPoint = context.Request.Path.Value;
+            return _options.Value.Rules.FirstOrDefault(x => endPoint.ToLowerInvariant().Contains(x.Endpoint.ToLowerInvariant()))
+                                                                                  ?? GetDefaultLimitRateValues(endPoint);
+        }
+
+        private static RateLimitRule GetDefaultLimitRateValues(string endPointKey)
         {
             return new RateLimitRule()
             {
                 DefaultLimit = 50,
                 Limit = 50,
                 DefaultPeriod = 10,
-                SuspendPeriod = 10
+                SuspendPeriod = 10,
+                EndPointKey = endPointKey
             };
         }
 
@@ -95,23 +99,15 @@ namespace WebApiRateLimiter
             _cache.Set(cacheName, cacheSetting, cacheEntryOptions);
         }
 
-        private Task Forbidden(HttpContext httpContext)
+        private static Task Forbidden(HttpContext httpContext)
         {
             httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
             return httpContext.Response.WriteAsync(Constants.FORBIDDEN_CONTENT);
         }
 
-        private string GetThrottleBaseKey(string serviceName)
+        private static string GetThrottleBaseKey(string serviceName)
         {
             return Constants.THROTTLE_BASE_KEY + serviceName;
-        }
-    }
-
-    public static class Extensions
-    {
-        public static bool ContainsIgnoreCase(this string source, string value, StringComparison stringComparison = StringComparison.CurrentCultureIgnoreCase)
-        {
-            return source != null && value != null && source.IndexOf(value, stringComparison) >= 0;
         }
     }
 }

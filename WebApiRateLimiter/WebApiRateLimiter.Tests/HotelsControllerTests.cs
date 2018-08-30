@@ -127,8 +127,6 @@ namespace WebApiRateLimiter.Tests
             }
             var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
 
-            response.EnsureSuccessStatusCode();
-
             var result = await response.Content.ReadAsStringAsync();
 
             Assert.IsTrue(result == Constants.FORBIDDEN_CONTENT);
@@ -142,8 +140,6 @@ namespace WebApiRateLimiter.Tests
                 await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
             }
             var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
-
-            response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
@@ -159,11 +155,9 @@ namespace WebApiRateLimiter.Tests
             }
             var response = await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
 
-            response.EnsureSuccessStatusCode();
-
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(result == Constants.SUSPEND_CONTENT);
+            Assert.IsTrue(result == Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
@@ -175,11 +169,9 @@ namespace WebApiRateLimiter.Tests
             }
             var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
 
-            response.EnsureSuccessStatusCode();
-
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(result == Constants.SUSPEND_CONTENT);
+            Assert.IsTrue(result == Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
@@ -190,8 +182,6 @@ namespace WebApiRateLimiter.Tests
                 await Client.GetAsync(Constants.HOTELS_BY_CITY_WEBAPI_URL);
             }
             var response = await Client.GetAsync(Constants.HOTELS_BY_ROOM_WEBAPI_URL);
-
-            response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsStringAsync();
 
@@ -227,7 +217,7 @@ namespace WebApiRateLimiter.Tests
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(result != Constants.SUSPEND_CONTENT);
+            Assert.IsTrue(result != Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
@@ -243,7 +233,7 @@ namespace WebApiRateLimiter.Tests
 
             var result = await response.Content.ReadAsStringAsync();
 
-            Assert.IsTrue(result != Constants.SUSPEND_CONTENT);
+            Assert.IsTrue(result != Constants.FORBIDDEN_CONTENT);
         }
 
         [TestMethod]
