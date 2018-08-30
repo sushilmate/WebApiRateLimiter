@@ -5,12 +5,10 @@ This project is to limit the rate of hit a web service can get, we can decide th
 1.	Installation process
     This project is web api, you can host in IIS, or self hosted server.
 2.	Software dependencies
-    IDE: Visula Studio 2017 Version 15.5.6
-    Framework: .Net Core 2.1 C#
-    Package: Nuget
-3.	Latest releases
-    No Releases.
-4.	API references
+    IDE: Visula Studio 2017 Version 15.5.6 <br>
+    Framework: .Net Core 2.1 C# https://www.microsoft.com/net/download/dotnet-core/2.1<br>
+    Package Manager: Nuget API https://www.nuget.org/api/v2
+3.	API references
     https://en.wikipedia.org/wiki/.NET_Core
 
 
