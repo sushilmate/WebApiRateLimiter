@@ -25,7 +25,7 @@ This project is to limit the rate of hit a web service can get, we can decide th
     3)  WebApiRateLimiter.Tests - This projects has end to end integration test cases.
 
 # Project Detais
-    I have used the .NET technology stack to implement this feature, I have build this project with latest framework/versions of the .NET.
+    I have used the .NET technology stack to implement this project, I have build this project with latest framework/versions of the .NET.
     
     I have started with C# .NET Core 2.1 version to implement this web api, keeping in mind code should be easy to scale if we bring more serivces to this project, it should be readable & kept DRY wherever possible.
     As mock data was provided so I decided to keep data in the project for simplicity rather than putting in to Database, implemented Repository pattern for reading the Data from the CSV, it super easy if you decide to bring databse in this project, you can easily switch to database. Repository provides abstraction & reduce repoetitive code even it helps us to write unit test cases.
@@ -38,6 +38,14 @@ This project is to limit the rate of hit a web service can get, we can decide th
     
     I have also used swagger for UI purpose, with the help of swagger you can easily invokes API from browser. when you run the project swagger UI gets loaded in the browser & shows all the services from the app.
     
-    There are different ways to implement rate limiting on APIs, I have started with the approch to have rate limitting with the help of attribute filters which gets trigger very later part of the ASP.NET Web api pipeline.
-    Later I realized if want to decide on APIs should be served or not 
+    There are different ways to implement rate limiting on APIs, I have started with the approch to have rate limitting with the help of attribute filters but when I read more about Web APIs & its pipeline (sequnce of resource loading), I realized we should decide the request should be served or not in the initial phase of API Pipeline, With attribut filter as I was deciding very later of the game.
+    its also not so scalable when we get millions of hit on services & we are loading most of the resources for a request & decide not to serve them.
+
+    There are middleware in .NET core, its very similar to HttpHandler & come in the early picture of web api pipeline (earlier than attribute filters). I have also used locks to synchronise the requests. server side memory caching to keep counter of APIs hit. cache is faster, easy to use.
+
+    This project also has logging mechanism, provided logging in the console whenever we hit the APIs or decide on rate limiting.
+
+    As I mentioned earlier we can use swagger to invoke the APIs, I have also created new console project for demo purpose. you can select run multiple projects from solution to check if the services is working or not.
+
+    I have also created the integration test cases which are end to end test cases for this project. I have created those test cases from the requirement mail & tested on my project. some of them got failed & then I realized beauty of TDD. it was fun writting them.
 
